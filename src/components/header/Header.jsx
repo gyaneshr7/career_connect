@@ -5,7 +5,7 @@ export default function Header() {
     <div className='header' >
            <div className='headerTitle' >
             {/* <span   className="headerTitleSM" >React & node</span> */}
-            <span className='headerTitleLg' >Blog Site</span>
+            <span className='headerTitleLg' >Career Connect</span>
            </div> 
            {/* <img  className='headerImg' src="http://localhost:7000/images/main.jpg" alt="" /> */}
            {/* <img  className='headerImg' src="https://www.shutterstock.com/image-photo/bloggingblog-concepts-ideas-computer-laptop-260nw-1255851382.jpg" alt="" /> */}
