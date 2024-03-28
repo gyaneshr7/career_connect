@@ -1,0 +1,7 @@
+.posts{
+    flex:9;
+    display: flex;
+    flex-wrap: wrap;
+    /* agr koi children beech me aa jaye to hat jao very imp */
+    margin: 20px;
+}
