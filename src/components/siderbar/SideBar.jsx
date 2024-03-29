@@ -16,8 +16,8 @@ export default function SideBar() {
     <div className='sidebar' >
         <div className="sidebarItem">
             <span className='sidebarTitle' >ABOUT ME</span>  
-            <img src="http://localhost:7000/images/yogi.jpeg" alt="" className='myImg' />
-            <p>This site is developed by Yogesh Whetwar.</p>
+            <img src="http://localhost:7000/images/gyanesh.jpeg" alt="" className='myImg' />
+            <p>This site is developed by Gyanesh Ramdurgekar.</p>
         </div> 
         <div className="sidebarItem">
             <span className='sidebarTitle' >CATEGORIES</span>

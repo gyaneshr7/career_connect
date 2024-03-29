@@ -22,14 +22,14 @@ function TopBar() {
          <Link to='/' className='link' >
           <li className='topListItem'  >HOME</li>
           </Link>   
-         <Link to='/'className='link'>
+         {/* <Link to='/'className='link'>
             <li className='topListItem' >ABOUT</li>
 
           </Link>   
          <Link to='/'className='link'>
 
             <li className='topListItem' >CONTACT</li>
-          </Link>   
+          </Link>    */}
          <Link to='/write'className='link'>
             <li className='topListItem' >WRITE</li>
           </Link>   
