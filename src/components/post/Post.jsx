@@ -7,7 +7,7 @@ export default function Post({post}) {
 
   const PF="http://localhost:7000/images/"
   return (
-    <div className='post' >
+    <div className='post' style={{width: "40%"}} >
       {post.photo && 
         <img src={PF+post.photo} alt="" className='postImg' /> 
       }
