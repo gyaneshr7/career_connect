@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useLocation } from "react-router-dom";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import './Resource.css'
+import "./Resource.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import Swal from "sweetalert2";
 
 import {
   faChain,
@@ -22,6 +24,7 @@ import { injectStyle } from "react-toastify/dist/inject-style";
 import { ToastContainer, toast } from "react-toastify";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import { Context } from "../../context/Context";
 
 const RescourcesTable = (props) => {
   if (typeof window !== "undefined") {
@@ -32,12 +35,12 @@ const RescourcesTable = (props) => {
   const timeAgo = new TimeAgo("en-US");
   const location = useLocation();
   const propsData = location.state;
-  let skillName = 'Web Development';
+  let skillName = "Web Development";
 
   const [loading, setLoading] = useState(false);
   const [loading2, setLoading2] = useState(false);
   const [show, setShow] = useState(false);
-  const [fileu, setFile] = useState();
+  const [file, setFile] = useState();
   const [link, setLink] = useState(false);
   const [title, setTitle] = useState();
   const [pdfFile, setPdfFile] = useState();
@@ -45,22 +48,21 @@ const RescourcesTable = (props) => {
   const [duplicateData, setDuplicateData] = useState([]);
   const [searched, setSearched] = useState("");
   const [searchval, setSearchVal] = useState("");
-  const [user, setUser] = useState();
+  const [singleUser, setsingleUser] = useState();
   const [img, setImg] = useState();
   const [pdfLink, setPdfLink] = useState();
   const [currentPage, setCurrentPage] = useState(1);
   const [mypdf, setMyPdf] = useState(false);
   const [filename, setFileName] = useState("");
   const [load, setLoad] = useState(false);
+  const [downloadFile, setDownloadFile] = useState("");
+  const [error, setError] = useState(false);
 
-  const role =
-    JSON.parse(localStorage.getItem("user")) &&
-    JSON.parse(localStorage.getItem("user")).role;
+  const { user } = useContext(Context);
 
   const itemsPerPage = 3;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-
 
   let tableData = data && data.slice(startIndex, endIndex);
   let searchData = searched && searched.slice(startIndex, endIndex);
@@ -91,8 +93,7 @@ const RescourcesTable = (props) => {
     });
     result = await result.json();
     setImg(result.img);
-    setUser(result);
-
+    setsingleUser(result);
   };
 
   function handleChange(e) {
@@ -123,18 +124,23 @@ const RescourcesTable = (props) => {
     if (pdfFile) {
       formData.append("file", pdfFile);
       formData.append("title", title);
-      formData.append("skill", skillName);
+      // formData.append("skill", skillName);
 
-      const response = await fetch("http://localhost:8000/upload", {
-        method: "POST",
-        body: formData,
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("jwt"),
-        },
-      });
+      const response = await fetch(
+        "http://localhost:7000/api/resource/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const responseWithBody = await response.json();
-      if (responseWithBody) toast.dark(responseWithBody);
+
+      if (responseWithBody.error) return setError(true);
+
+      setDownloadFile(responseWithBody);
+      
+      if (responseWithBody.fileName) toast.dark(responseWithBody);
       setLoading(false);
       setTitle("");
       setFile("");
@@ -146,23 +152,31 @@ const RescourcesTable = (props) => {
       setTimeout(() => {
         setLoad(true);
       }, 5000);
-
+      
+      if(responseWithBody.error){
+        return Swal.fire({
+          title: "Document already exists",
+          icon: 'error'
+        })
+      }
       // window.location.href = '/rescourcesDisplay';
     } else if (pdfLink) {
       const val = {
         title: title,
         url: pdfLink,
-        skill: skillName,
       };
 
-      const response = await fetch("http://localhost:8000/linkUpload", {
-        method: "POST",
-        body: JSON.stringify(val),
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("jwt"),
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        "http://localhost:7000/api/resource/linkUpload",
+        {
+          method: "POST",
+          body: JSON.stringify(val),
+          // headers: {
+          //   Authorization: "Bearer " + localStorage.getItem("jwt"),
+          //   "Content-Type": "application/json",
+          // },
+        }
+      );
 
       const responseWithBody = await response.json();
       if (responseWithBody) toast.dark(responseWithBody);
@@ -221,44 +235,41 @@ const RescourcesTable = (props) => {
     setTitle(filteredValue);
   };
 
-//   const handleDeleteClick = (id, driveId) => {
-//     Swal.fire({
-//       title: "Are you sure?",
-//       text: "Are you sure you want to delete this resource?",
-//       icon: "warning",
-//       showCancelButton: true,
-//       confirmButtonColor: "#d33",
-//       cancelButtonColor: "#3085d6",
-//       confirmButtonText: "Yes, delete it!",
-//     }).then(async (result) => {
-//       if (result.isConfirmed) {
-//         const _id = { _id: id, driveId };
-//         const deleteCall = await fetch(
-//           "http://localhost:8000/delete/Resource/pdf",
-//           {
-//             method: "DELETE",
-//             headers: {
-//               "Content-Type": "application/json",
-//             },
-//             body: JSON.stringify(_id),
-//           }
-//         );
+  const handleDeleteClick = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Are you sure you want to delete this resource?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const deleteCall = await fetch(
+          `http://localhost:7000/api/resource/delete/${id}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-//         const response = await deleteCall.json();
+        const response = await deleteCall.json();
 
-//         const updatedData = data.filter((item) => {
-//           return item._id !== id;
-//         });
+        const updatedData = data.filter((item) => {
+          return item._id !== id;
+        });
 
+        setData(updatedData);
 
-//         setData(updatedData);
+        Swal.fire("Deleted!", response, "success");
+      }
+    });
+  };
 
-//         Swal.fire("Deleted!", response, "success");
-//       }
-//     });
-//   };
-
-//   console.log(data);
+  const downloadableLink = `http://localhost:7000/api/resource/download?fileName=${downloadFile.fileName}`;
   return (
     <>
       <div className="Res-table-display md:pt-[100px]">
@@ -280,7 +291,7 @@ const RescourcesTable = (props) => {
                 </button>
               </div>
 
-              {/* {role !== "Club_Member" ? (
+              {user.username === "Gyanesh" ? (
                 <button
                   onClick={handleShow}
                   className="btn btn-primary res-add-btn"
@@ -289,7 +300,7 @@ const RescourcesTable = (props) => {
                 </button>
               ) : (
                 ""
-              )} */}
+              )}
 
               {/* modal popup to add rescources  */}
 
@@ -311,7 +322,7 @@ const RescourcesTable = (props) => {
                         <img src={img} alt="" />
                       </div>
                       <div className="modal-add-res-section-profile relative bottom-2">
-                        <h5>{user && user.name}</h5>
+                        <h5>{singleUser && singleUser.name}</h5>
                         <p className="text-gray-500 bottom-3 relative pl-3 text-[0.8rem] font-[600]">
                           {" "}
                           {skillName}{" "}
@@ -388,7 +399,7 @@ const RescourcesTable = (props) => {
                         className="btn btn-primary"
                         type="submit"
                         variant="primary"
-                        disabled={title && (fileu || pdfLink) ? false : true}
+                        disabled={title && (file || pdfLink) ? false : true}
                       >
                         {loading ? (
                           <div
@@ -451,7 +462,7 @@ const RescourcesTable = (props) => {
                         <tr key={item._id}>
                           <td className="p-2">
                             <a
-                              href={item && item.url}
+                              href={downloadableLink}
                               target="_blank"
                               className="text-black"
                             >
@@ -484,9 +495,20 @@ const RescourcesTable = (props) => {
                           </td>
                           <td className="p-2">
                             <div className="text-left text-black font-[500] text-[1rem]">
-                              {item && item.author && item.author.name}
+                              Gyanesh
                             </div>
                           </td>
+                          {user.username === "Gyanesh" && (
+                            <td>
+                              <FontAwesomeIcon
+                                icon={faTrash}
+                                className="w-5 h-5 hover:text-red-600 rounded-full hover:bg-gray-100 p-1"
+                                onClick={() =>
+                                  handleDeleteClick(item._id)
+                                }
+                              />
+                            </td>
+                          )}
                         </tr>
                       ))
                     ) : (
@@ -505,44 +527,44 @@ const RescourcesTable = (props) => {
                       <td className="w-full" colspan="4">
                         <div
                           role="status"
-                          class=" w-full  p-4 space-y-4 border border-gray-200 divide-y divide-gray-200 rounded shadow animate-pulse dark:divide-gray-700 md:p-6 dark:border-gray-700"
+                          className=" w-full  p-4 space-y-4 border border-gray-200 divide-y divide-gray-200 rounded shadow animate-pulse dark:divide-gray-700 md:p-6 dark:border-gray-700"
                         >
-                          <div class="flex items-center justify-between">
+                          <div className="flex items-center justify-between">
                             <div>
-                              <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
-                              <div class="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                              <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
+                              <div className="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
                             </div>
-                            <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
+                            <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
                           </div>
-                          <div class="flex items-center justify-between pt-4">
+                          <div className="flex items-center justify-between pt-4">
                             <div>
-                              <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
-                              <div class="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                              <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
+                              <div className="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
                             </div>
-                            <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
+                            <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
                           </div>
-                          <div class="flex items-center justify-between pt-4">
+                          <div className="flex items-center justify-between pt-4">
                             <div>
-                              <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
-                              <div class="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                              <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
+                              <div className="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
                             </div>
-                            <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
+                            <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
                           </div>
-                          <div class="flex items-center justify-between pt-4">
+                          <div className="flex items-center justify-between pt-4">
                             <div>
-                              <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
-                              <div class="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                              <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
+                              <div className="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
                             </div>
-                            <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
+                            <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
                           </div>
-                          {/* <div class="flex items-center justify-between pt-4">
+                          {/* <div className="flex items-center justify-between pt-4">
                       <div>
-                        <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
-                        <div class="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                        <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24 mb-2.5"></div>
+                        <div className="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
                       </div>
-                      <div class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
+                      <div className="h-2.5 bg-gray-300 rounded-full dark:bg-gray-700 w-12"></div>
                     </div> */}
-                          <span class="sr-only">Loading...</span>
+                          <span className="sr-only">Loading...</span>
                         </div>
                       </td>
                     </tr>
