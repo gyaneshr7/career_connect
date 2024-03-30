@@ -10,7 +10,9 @@ export default function Posts() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const res = await axios.get(`http://localhost:7000/api/post/get/${option}`);
+      const res = await axios.get(
+        `http://localhost:7000/api/post/get/${option}`
+      );
       // console.log(res);
 
       setPosts(res.data);
@@ -20,15 +22,29 @@ export default function Posts() {
   }, [option]);
 
   useEffect(() => {
-    fetch('http://localhost:7000/api/post/titles')
+    fetch("http://localhost:7000/api/post/titles")
       .then((response) => response.json())
       .then((data) => setOptions(data))
-      .catch((error) => console.error('Error fetching options:', error));
+      .catch((error) => console.error("Error fetching options:", error));
   }, []);
 
   return (
-    <div className="post-section" style={{display: "flex", flexDirection: 'column', marginTop: "5vh", width:"65%"}}>
-      <select style={{width: "50%", marginLeft: "auto", marginRight: "auto"}} onChange={(e) => {setOption(e.target.value); console.log('hrllo');}}>
+    <div
+      className="post-section"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        marginTop: "5vh",
+        width: "65%",
+      }}
+    >
+      <select
+        className="w-1/2 mx-auto p-2 border rounded-lg bg-gray-200 text-gray-800"
+        onChange={(e) => {
+          setOption(e.target.value);
+          console.log("hrllo");
+        }}
+      >
         <option>All</option>
         {options.map((option) => (
           <option key={option} value={option}>
@@ -36,11 +52,11 @@ export default function Posts() {
           </option>
         ))}
       </select>
-      <div className="posts" style={{display: 'flex'}}>
+      <div className="posts" style={{ display: "flex" }}>
         {posts.map((p) => (
-          <Post key={p.id} post={p} option={option}/>
-          ))}
-          </div>
+          <Post key={p.id} post={p} option={option} />
+        ))}
       </div>
+    </div>
   );
 }

@@ -33,6 +33,11 @@ function TopBar() {
          <Link to='/write'className='link'>
             <li className='topListItem' >WRITE</li>
           </Link>   
+         
+         <Link to='/resource'className='link'>
+            <li className='topListItem' >RESOURCE</li>
+          </Link>   
+         
          <Link to='/'className='link'>
             <li className='topListItem'onClick={handleLogout} > {user && "LOGOUT"}</li>
           </Link>   
