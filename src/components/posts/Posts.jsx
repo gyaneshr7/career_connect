@@ -18,11 +18,10 @@ export default function Posts() {
       setPosts(res.data);
     };
     fetchPosts();
-    console.log("option changed");
   }, [option]);
 
   useEffect(() => {
-    fetch("http://localhost:7000/api/post/titles")
+    fetch("http://localhost:7000/api/post/companies")
       .then((response) => response.json())
       .then((data) => setOptions(data))
       .catch((error) => console.error("Error fetching options:", error));
