@@ -13,7 +13,9 @@ export default function Write() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(user);
+    
+    const textWithNewlines = desc.replace(/\n/g, '\\n');
+
     const newPost = {
       username: user.username,
       title,

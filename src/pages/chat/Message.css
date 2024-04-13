@@ -1,0 +1,45 @@
+/* .message{
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    color: white;
+    width: 100%;
+}
+
+.message__info{
+    margin-left: 20px;
+    width: 100%;
+}
+
+.message__timestamp{
+    color: gray;
+    margin-left: 20px;
+    font-size: x-small;
+} */
+
+.message{
+    display: flex;
+    align-items: flex-start;
+    padding: 20px;
+    color: white;
+    justify-content: space-between;
+}
+
+.message__content{
+    display: flex;
+}
+
+.message__info{
+    margin-left: 20px;
+    padding-right: 40px;
+}
+
+.message__info p {
+    word-break: break-all;
+}
+
+.message__timestamp{
+    color: gray;
+    margin-left: 20px;
+    font-size: x-small;
+}

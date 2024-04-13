@@ -206,6 +206,8 @@ const RescourcesTable = (props) => {
     result = await result.json();
     console.log(result);
     setData(result);
+    setDownloadFile(result)
+    // console.log(downloadFile);
     setDuplicateData(result);
     setLoading2(false);
   };
@@ -270,6 +272,7 @@ const RescourcesTable = (props) => {
   };
 
   const downloadableLink = `http://localhost:7000/api/resource/download?fileName=${downloadFile.fileName}`;
+  console.log(user);
   return (
     <>
       <div className="Res-table-display md:pt-[100px]">
@@ -462,7 +465,7 @@ const RescourcesTable = (props) => {
                         <tr key={item._id}>
                           <td className="p-2">
                             <a
-                              href={downloadableLink}
+                              href={`http://localhost:7000/api/resource/download?fileName=${item.filePath.split('\\')[item.filePath.split('\\').length - 1]}`}
                               target="_blank"
                               className="text-black"
                             >

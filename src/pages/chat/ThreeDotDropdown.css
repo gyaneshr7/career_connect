@@ -1,0 +1,40 @@
+/* Dropdown container */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+  }
+  
+  /* Three-dot icon */
+  .toggle-dropdown {
+    cursor: pointer;
+  }
+
+  
+  /* Dropdown menu */
+  .menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #f50505;
+    min-width: 120px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    color: white;
+    border-radius: 5px;
+  }
+  
+  /* Dropdown item */
+  .item {
+    /* padding: 0px 12px; */
+    cursor: pointer;
+    margin: auto;
+    margin-left: 30%;
+  }
+  
+  /* Hover effect on dropdown item */
+  .menu:hover {
+    background-color: #f33636;
+    color: white;
+  }
+  

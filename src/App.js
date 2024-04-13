@@ -10,6 +10,7 @@ import Single from "./pages/single/Single";
 import { useContext } from "react";
 import { Context } from "./context/Context";
 import Resource from "./pages/resource/Resource.jsx";
+import ChatApp from "./pages/chat/chat.jsx";
 function App() {  
   const {user}=useContext(Context)
 
@@ -24,6 +25,7 @@ function App() {
   <Route path="/resource"  exact element={user ? <Resource/>:<Register/>} ></Route>
   <Route path="/settings"  exact element={user ? <Settings/>: <Register/>} ></Route>
   <Route path="/post/:postId"  exact element={<Single></Single>} ></Route>
+  <Route path="/chat"  exact element={user ? <ChatApp/> : <Register/>} ></Route>
   
 </Routes>
 </BrowserRouter>

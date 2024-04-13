@@ -12,6 +12,7 @@ export default function SinglePost() {
 
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
+  const [actualDesc, setActualDesc] = useState("");
   const [updateMode, setUpdateMode] = useState(false);
 
   const PF = "http://localhost:7000/images/";
@@ -23,6 +24,12 @@ export default function SinglePost() {
       setPost(res.data);
       setTitle(res.data.title);
       setDesc(res.data.desc);
+      console.log(res.data.desc);
+      setActualDesc(res.data.desc.replace(/\n/g, "<br>"));
+      console.log(actualDesc);
+
+      //  const actualdesc = desc.replace(/\n/g, '<br>');
+      //  console.log(actualdesc);
     };
     fetchPosts();
   }, [path]);
@@ -44,6 +51,9 @@ export default function SinglePost() {
   // console.log(user.username);
   const handleUpdate = async () => {
     try {
+      // const textWithNewlines = desc.replace(/\n/g, '\\n');
+      // setActualDesc(desc.replace(/\n/g, '<br>'));
+
       await axios.put(`http://localhost:7000/api/post/${post._id}`, {
         username: user.username,
         title,
@@ -55,6 +65,10 @@ export default function SinglePost() {
       console.log(err);
     }
   };
+
+  // const actualdesc = desc.replace(/\n/g, '<br>');
+  // console.log(actualdesc);
+
   return (
     <div className="singlePost">
       <div className="singlePostWrapper">
@@ -109,7 +123,14 @@ export default function SinglePost() {
             </button>
           </>
         ) : (
-          <p className="singlePostDesc">{desc}</p>
+          <div className="singlePostDesc">
+            {desc.split("\n").map((paragraph, index) => (
+              <>
+                <p key={index}>{paragraph}</p>
+                <br />
+              </>
+            ))}
+          </div>
         )}
       </div>
     </div>

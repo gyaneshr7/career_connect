@@ -38,6 +38,10 @@ function TopBar() {
             <li className='topListItem' >RESOURCE</li>
           </Link>   
          
+         <Link to='/chat'className='link'>
+            <li className='topListItem' >DISCUSSION</li>
+          </Link>   
+         
          <Link to='/'className='link'>
             <li className='topListItem'onClick={handleLogout} > {user && "LOGOUT"}</li>
           </Link>   
